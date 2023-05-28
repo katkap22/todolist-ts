@@ -11,11 +11,12 @@ type PropsType = {
   id:string
   title: string;
   tasks: Array<TaskType>;
-  removeTask: (id: string) => void;
+  removeTask: (id: string, todolistId: string) => void;
   changeFilter: (value: FilterValuesType, todolistId: string) => void;
-  addTask: (title: string) => void;
-  changeTaskStatus: (taskId: string, isDone: boolean) => void;
+  addTask: (title: string, todolistId: string) => void;
+  changeTaskStatus: (taskId: string, isDone: boolean, todolistId: string) => void;
   filter: FilterValuesType;
+  removeTodolist: (todolistId: string) => void;
 };
 
 export function Todolist(props: PropsType) {
@@ -30,7 +31,7 @@ export function Todolist(props: PropsType) {
     setError(null);
     if (event.charCode === 13) {
       if (newTaskTitle.trim() !== "" && newTaskTitle.trim() !== "kakashka") {
-        props.addTask(newTaskTitle.trim());
+        props.addTask(newTaskTitle.trim(), props.id);
         setNewTaskTitle("");
       } else {
         setError("Title is required");
@@ -40,7 +41,7 @@ export function Todolist(props: PropsType) {
 
   const addTask = ()=> {
     if (newTaskTitle.trim() !== '' && newTaskTitle.trim() !== 'kakashka') {
-      props.addTask(newTaskTitle.trim());
+      props.addTask(newTaskTitle.trim(), props.id);
       setNewTaskTitle("");
     } else {
       setError('Title is required');
@@ -50,10 +51,11 @@ export function Todolist(props: PropsType) {
   const onAllClickHandler = () => props.changeFilter("all", props.id);
   const onActiveClickHandler = () => props.changeFilter("active", props.id);
   const onCompleteClickHandler = () => props.changeFilter("completed", props.id);
+  const removeTodolist = () => props.removeTodolist(props.id);
 
   return (
     <div>
-      <h3>{props.title}</h3>
+      <h3>{props.title}<button onClick={removeTodolist}>x</button></h3>
       <div>
         <input
           value={newTaskTitle}
@@ -66,14 +68,14 @@ export function Todolist(props: PropsType) {
       </div>
       <ul>
         {props.tasks.map((task) => {
-          const onRemoveHandler = () => props.removeTask(task.id);
+          const onRemoveHandler = () => props.removeTask(task.id, props.id);
           const onChangeStatusHandler = (
             event: ChangeEvent<HTMLInputElement>
           ) => {
             console.log(
               task.id + " want to change on " + event.currentTarget.checked
             );
-            props.changeTaskStatus(task.id, event.currentTarget.checked);
+            props.changeTaskStatus(task.id, event.currentTarget.checked, props.id);
           };
 
           return (
